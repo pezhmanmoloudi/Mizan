@@ -1,4 +1,4 @@
-import type { NewTransaction, Transaction, TransactionRow } from '../models';
+import type { NewTransaction, Transaction, TransactionPatch, TransactionRow } from '../models';
 import type { EntryType, PaymentMethod } from '../types';
 import { generateId, mapSyncMeta } from '../utils';
 import { BaseRepository } from './BaseRepository';
@@ -88,6 +88,49 @@ export class TransactionRepository extends BaseRepository implements ITransactio
       deletedAt: null,
       syncStatus: 'local',
     };
+  }
+
+  /**
+   * Partial update. Columns are whitelisted (never interpolated from the patch keys) and
+   * `updated_at`/`sync_status` are bumped so a future sync picks the change up.
+   */
+  async update(id: string, patch: TransactionPatch): Promise<Transaction | null> {
+    const db = await this.db();
+    const now = this.nowIso();
+    const columns: string[] = [];
+    const values: (string | number | null)[] = [];
+    if (patch.categoryId !== undefined) {
+      columns.push('category_id = ?');
+      values.push(patch.categoryId);
+    }
+    if (patch.amount !== undefined) {
+      columns.push('amount = ?');
+      values.push(patch.amount);
+    }
+    if (patch.type !== undefined) {
+      columns.push('type = ?');
+      values.push(patch.type);
+    }
+    if (patch.note !== undefined) {
+      columns.push('note = ?');
+      values.push(patch.note ?? null);
+    }
+    if (patch.date !== undefined) {
+      columns.push('date = ?');
+      values.push(patch.date);
+    }
+    if (patch.paymentMethod !== undefined) {
+      columns.push('payment_method = ?');
+      values.push(patch.paymentMethod);
+    }
+    columns.push('updated_at = ?');
+    values.push(now);
+    columns.push("sync_status = 'pending'");
+    await db.runAsync(`UPDATE ${this.table} SET ${columns.join(', ')} WHERE id = ?;`, [
+      ...values,
+      id,
+    ]);
+    return this.findById(id);
   }
 
   /** Soft delete (tombstone) — keeps the row for sync reconciliation. */

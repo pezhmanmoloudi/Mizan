@@ -1,14 +1,14 @@
-import { useRtlOverride, useThemePreference, useUiStore } from '@/store';
+import { useRtlOverride, useSettingsStore, useThemePreference } from '@/store';
 
 /**
  * Reads and writes the theme + direction preferences. Keeps preference logic out of the
- * screen (screens stay presentational) while delegating to the canonical `uiStore`.
+ * screen (screens stay presentational) while delegating to the persisted `settings` store.
  */
 export function useThemeSettings() {
   const themePreference = useThemePreference();
-  const setThemePreference = useUiStore((s) => s.setThemePreference);
+  const setThemePreference = useSettingsStore((s) => s.setThemePreference);
   const rtlOverride = useRtlOverride();
-  const setRtlOverride = useUiStore((s) => s.setRtlOverride);
+  const setRtlOverride = useSettingsStore((s) => s.setRtlOverride);
 
   return { themePreference, setThemePreference, rtlOverride, setRtlOverride };
 }

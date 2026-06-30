@@ -40,3 +40,8 @@ export type NewCategory = {
   type: EntryType;
   isDefault?: boolean;
 };
+
+/** Mutable fields on an existing category. Sync/audit columns are managed by the repo. */
+export type CategoryPatch = Partial<
+  Pick<Category, 'name' | 'color' | 'icon' | 'type' | 'isDefault'>
+>;

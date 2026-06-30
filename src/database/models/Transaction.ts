@@ -43,3 +43,8 @@ export type NewTransaction = {
   date: ISODateString;
   paymentMethod: PaymentMethod;
 };
+
+/** Mutable fields on an existing transaction. `userId` is immutable; sync columns are repo-managed. */
+export type TransactionPatch = Partial<
+  Pick<Transaction, 'categoryId' | 'amount' | 'type' | 'note' | 'date' | 'paymentMethod'>
+>;
