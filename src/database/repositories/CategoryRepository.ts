@@ -1,4 +1,4 @@
-import type { Category, CategoryRow, NewCategory } from '../models';
+import type { Category, CategoryPatch, CategoryRow, NewCategory } from '../models';
 import type { EntryType } from '../types';
 import { boolToInt, generateId, intToBool, mapSyncMeta } from '../utils';
 import { BaseRepository } from './BaseRepository';
@@ -64,6 +64,45 @@ export class CategoryRepository extends BaseRepository implements ICategoriesRep
       deletedAt: null,
       syncStatus: 'local',
     };
+  }
+
+  /**
+   * Partial update. Columns are whitelisted (never interpolated from the patch keys) and
+   * `updated_at`/`sync_status` are bumped so a future sync picks the change up.
+   */
+  async update(id: string, patch: CategoryPatch): Promise<Category | null> {
+    const db = await this.db();
+    const now = this.nowIso();
+    const columns: string[] = [];
+    const values: (string | number | null)[] = [];
+    if (patch.name !== undefined) {
+      columns.push('name = ?');
+      values.push(patch.name);
+    }
+    if (patch.color !== undefined) {
+      columns.push('color = ?');
+      values.push(patch.color);
+    }
+    if (patch.icon !== undefined) {
+      columns.push('icon = ?');
+      values.push(patch.icon ?? null);
+    }
+    if (patch.type !== undefined) {
+      columns.push('type = ?');
+      values.push(patch.type);
+    }
+    if (patch.isDefault !== undefined) {
+      columns.push('is_default = ?');
+      values.push(boolToInt(patch.isDefault));
+    }
+    columns.push('updated_at = ?');
+    values.push(now);
+    columns.push("sync_status = 'pending'");
+    await db.runAsync(`UPDATE ${this.table} SET ${columns.join(', ')} WHERE id = ?;`, [
+      ...values,
+      id,
+    ]);
+    return this.findById(id);
   }
 
   /** Soft delete (tombstone) — keeps the row for sync reconciliation. */

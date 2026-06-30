@@ -1,4 +1,13 @@
-import type { Category, NewCategory, NewTransaction, NewUser, Transaction, User } from '../models';
+import type {
+  Category,
+  CategoryPatch,
+  NewCategory,
+  NewTransaction,
+  NewUser,
+  Transaction,
+  TransactionPatch,
+  User,
+} from '../models';
 
 /**
  * Read/write contracts for the repository layer. Screens and feature hooks depend on these
@@ -20,7 +29,10 @@ export interface WriteRepository<TModel, TNew> {
 }
 
 export interface ICategoriesRepository
-  extends ReadRepository<Category>, WriteRepository<Category, NewCategory> {}
+  extends ReadRepository<Category>, WriteRepository<Category, NewCategory> {
+  /** Partial update of an existing category. Returns the updated model, or null if missing. */
+  update(id: string, patch: CategoryPatch): Promise<Category | null>;
+}
 
 export interface IUsersRepository extends ReadRepository<User>, WriteRepository<User, NewUser> {
   /** The local guest user, if one exists. Foundation for the future auth flow. */
@@ -30,4 +42,6 @@ export interface IUsersRepository extends ReadRepository<User>, WriteRepository<
 export interface ITransactionsRepository
   extends ReadRepository<Transaction>, WriteRepository<Transaction, NewTransaction> {
   findByUser(userId: string): Promise<Transaction[]>;
+  /** Partial update of an existing transaction. Returns the updated model, or null if missing. */
+  update(id: string, patch: TransactionPatch): Promise<Transaction | null>;
 }

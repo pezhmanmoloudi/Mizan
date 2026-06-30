@@ -1,31 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-import { databaseService } from '@/database';
-import { createLogger } from '@/utils';
-
-const log = createLogger('app.bootstrap');
+import { useAppReady, useAppStore } from '@/store';
 
 /**
- * One-time app initialization: opens the database and runs migrations. Returns a `ready`
- * flag so the root can hold rendering until offline storage is available.
+ * One-time app initialization. Delegates the startup sequence (DB init + migrations,
+ * settings hydration, guest session, initial data load) to the `app` store's idempotent
+ * `initialize()`, and exposes a `ready` flag so the root holds rendering until the offline
+ * data layer is available.
  */
 export function useBootstrap() {
-  const [ready, setReady] = useState(false);
+  const ready = useAppReady();
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        await databaseService.init();
-      } catch (e) {
-        log.error('Bootstrap failed', e);
-      } finally {
-        if (!cancelled) setReady(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    void useAppStore.getState().initialize();
   }, []);
 
   return { ready };

@@ -62,4 +62,20 @@ describe('TransactionRepository', () => {
     expect(created.note).toBeNull();
     expect(created.syncStatus).toBe('local');
   });
+
+  it('update patches whitelisted columns, bumps updated_at, marks pending, and re-reads', async () => {
+    fake.getFirstAsync.mockResolvedValueOnce({ ...row, amount: 20 });
+    const result = await repo.update('txn-1', { amount: 20, note: 'Dinner' });
+
+    const [sql, params] = fake.runAsync.mock.calls[0] ?? [];
+    expect(sql).toContain('amount = ?');
+    expect(sql).toContain('note = ?');
+    expect(sql).not.toContain('category_id = ?');
+    expect(sql).toContain('updated_at = ?');
+    expect(sql).toContain("sync_status = 'pending'");
+    expect(params?.[0]).toBe(20);
+    expect(params?.[1]).toBe('Dinner');
+    expect(params?.[params.length - 1]).toBe('txn-1');
+    expect(result?.amount).toBe(20);
+  });
 });

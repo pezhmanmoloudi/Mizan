@@ -71,4 +71,26 @@ describe('CategoryRepository', () => {
     expect(sql).toContain("sync_status = 'pending'");
     expect(params?.[2]).toBe('category:food');
   });
+
+  it('update sets only the patched columns, bumps updated_at, marks pending, and re-reads', async () => {
+    fake.getFirstAsync.mockResolvedValueOnce({ ...row, name: 'Groceries' });
+    const result = await repo.update('category:food', { name: 'Groceries' });
+
+    const [sql, params] = fake.runAsync.mock.calls[0] ?? [];
+    expect(sql).toContain('name = ?');
+    expect(sql).not.toContain('color = ?');
+    expect(sql).toContain('updated_at = ?');
+    expect(sql).toContain("sync_status = 'pending'");
+    // params: name, updated_at, id (id is always last)
+    expect(params?.[0]).toBe('Groceries');
+    expect(params?.[params.length - 1]).toBe('category:food');
+    expect(result?.name).toBe('Groceries');
+  });
+
+  it('update converts isDefault to an integer column', async () => {
+    await repo.update('category:food', { isDefault: false });
+    const [sql, params] = fake.runAsync.mock.calls[0] ?? [];
+    expect(sql).toContain('is_default = ?');
+    expect(params?.[0]).toBe(0);
+  });
 });
