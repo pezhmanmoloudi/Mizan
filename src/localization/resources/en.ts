@@ -71,4 +71,16 @@ export const en = {
     note: 'Note',
     notePlaceholder: 'What was this for?',
   },
+  categories: {
+    // Default (seeded) category names. Keys match `database/seeds/defaultCategories`.
+    defaults: {
+      food: 'Food',
+      transport: 'Transport',
+      shopping: 'Shopping',
+      bills: 'Bills',
+      health: 'Health',
+      entertainment: 'Entertainment',
+      other: 'Other',
+    },
+  },
 };

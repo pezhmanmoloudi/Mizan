@@ -1,11 +1,14 @@
-import type { Category, CategoryRow } from '../models';
+import type { Category, CategoryRow, NewCategory } from '../models';
+import type { EntryType } from '../types';
+import { boolToInt, generateId, intToBool, mapSyncMeta } from '../utils';
 import { BaseRepository } from './BaseRepository';
+import type { ICategoriesRepository } from './types';
 
 /**
  * Reference repository demonstrating the row<->model mapping, soft-delete and sync-status
  * conventions. Business rules do NOT belong here — only persistence.
  */
-export class CategoryRepository extends BaseRepository {
+export class CategoryRepository extends BaseRepository implements ICategoriesRepository {
   protected readonly table = 'categories';
 
   private toModel(row: CategoryRow): Category {
@@ -14,10 +17,9 @@ export class CategoryRepository extends BaseRepository {
       name: row.name,
       color: row.color,
       icon: row.icon,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      deletedAt: row.deleted_at,
-      syncStatus: row.sync_status as Category['syncStatus'],
+      type: row.type as EntryType,
+      isDefault: intToBool(row.is_default),
+      ...mapSyncMeta(row),
     };
   }
 
@@ -38,17 +40,25 @@ export class CategoryRepository extends BaseRepository {
     return row ? this.toModel(row) : null;
   }
 
-  async create(input: Pick<Category, 'id' | 'name' | 'color' | 'icon'>): Promise<Category> {
+  async create(input: NewCategory): Promise<Category> {
     const db = await this.db();
     const now = this.nowIso();
+    const id = input.id ?? generateId();
+    const icon = input.icon ?? null;
+    const isDefault = input.isDefault ?? false;
     await db.runAsync(
       `INSERT INTO ${this.table}
-        (id, name, color, icon, created_at, updated_at, deleted_at, sync_status)
-       VALUES (?, ?, ?, ?, ?, ?, NULL, 'local');`,
-      [input.id, input.name, input.color, input.icon, now, now],
+        (id, name, color, icon, type, is_default, created_at, updated_at, deleted_at, sync_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 'local');`,
+      [id, input.name, input.color, icon, input.type, boolToInt(isDefault), now, now],
     );
     return {
-      ...input,
+      id,
+      name: input.name,
+      color: input.color,
+      icon,
+      type: input.type,
+      isDefault,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,

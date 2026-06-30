@@ -72,4 +72,15 @@ export const fa: typeof en = {
     note: 'یادداشت',
     notePlaceholder: 'این برای چه بود؟',
   },
+  categories: {
+    defaults: {
+      food: 'خوراک',
+      transport: 'حمل‌ونقل',
+      shopping: 'خرید',
+      bills: 'قبوض',
+      health: 'سلامت',
+      entertainment: 'سرگرمی',
+      other: 'سایر',
+    },
+  },
 };
