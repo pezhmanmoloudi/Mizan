@@ -4,7 +4,7 @@ import { useTheme } from '@/theme';
 
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost';
 
 export type ButtonProps = Omit<PressableProps, 'children'> & {
   label: string;
@@ -27,11 +27,13 @@ export function Button({
   const background: Record<ButtonVariant, string> = {
     primary: theme.colors.primary,
     secondary: theme.colors.primaryMuted,
+    destructive: theme.colors.error,
     ghost: theme.colors.transparent,
   };
   const textColor: Record<ButtonVariant, keyof typeof theme.colors> = {
     primary: 'onPrimary',
     secondary: 'primary',
+    destructive: 'onPrimary',
     ghost: 'primary',
   };
 

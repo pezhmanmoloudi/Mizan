@@ -1,6 +1,6 @@
 import { ActivityIndicator, View } from 'react-native';
 
-import { Button, Spacer, Text } from '@/components/ui';
+import { Button, type IconName, IconTile, Spacer, Text } from '@/components/ui';
 import { useTheme } from '@/theme';
 
 const centered = {
@@ -51,10 +51,28 @@ export function ErrorState({
   );
 }
 
-export function EmptyState({ title, description }: { title: string; description?: string }) {
+export function EmptyState({
+  title,
+  description,
+  icon,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  description?: string;
+  icon?: IconName;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
   const theme = useTheme();
   return (
     <View style={[centered, { padding: theme.spacing.xl }]}>
+      {icon ? (
+        <>
+          <IconTile name={icon} size={56} />
+          <Spacer size="lg" />
+        </>
+      ) : null}
       <Text variant="heading" align="center">
         {title}
       </Text>
@@ -64,6 +82,12 @@ export function EmptyState({ title, description }: { title: string; description?
           <Text variant="body" color="textMuted" align="center">
             {description}
           </Text>
+        </>
+      ) : null}
+      {actionLabel && onAction ? (
+        <>
+          <Spacer size="lg" />
+          <Button label={actionLabel} onPress={onAction} />
         </>
       ) : null}
     </View>
