@@ -3,12 +3,13 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import { createLogger } from '@/utils';
 
 import { migration0001 } from './0001_init';
+import { migration0002 } from './0002_users_transactions';
 import type { Migration } from './types';
 
 const log = createLogger('database.migrations');
 
 // Ordered list of migrations. Append new migrations here; never edit a shipped one.
-const MIGRATIONS: Migration[] = [migration0001];
+export const MIGRATIONS: Migration[] = [migration0001, migration0002];
 
 /**
  * Idempotent migration runner using SQLite's `user_version` pragma. Applies every
