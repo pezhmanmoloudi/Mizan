@@ -58,7 +58,6 @@ export function useAsync<T>(asyncFn: () => Promise<T>, options: { immediate?: bo
   useEffect(() => {
     // Mount-time fetch: synchronizing with an external system (repository/service) is a
     // valid effect use, so the setState-in-effect heuristic is intentionally suppressed.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (immediate) void run();
   }, [immediate, run]);
 

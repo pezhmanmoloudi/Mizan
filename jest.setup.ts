@@ -8,3 +8,15 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 // Reanimated ships a Jest mock so its native worklets aren't required in tests.
 jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+
+// @expo/vector-icons loads fonts asynchronously and calls setState after render, which
+// triggers act() warnings in tests. Replace every icon set with a lightweight stub that
+// renders the icon name as Text, so icons stay queryable without the async font load.
+jest.mock('@expo/vector-icons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return new Proxy(
+    {},
+    { get: () => (props: Record<string, unknown>) => React.createElement(Text, props, props.name) },
+  );
+});

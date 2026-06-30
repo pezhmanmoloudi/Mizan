@@ -8,6 +8,8 @@ export type ColorTokens = {
   primary: string;
   primaryHover: string;
   onPrimary: string;
+  /** Translucent layer for chips/icons resting on a primary-filled surface. */
+  onPrimaryMuted: string;
   primaryMuted: string;
 
   success: string;
@@ -36,6 +38,7 @@ export const lightColors: ColorTokens = {
   primary: palette.blue500,
   primaryHover: palette.blue600,
   onPrimary: palette.white,
+  onPrimaryMuted: 'rgba(255, 255, 255, 0.15)',
   primaryMuted: palette.blue100,
 
   success: palette.green500,
@@ -49,7 +52,7 @@ export const lightColors: ColorTokens = {
   surface: palette.white,
   surfaceElevated: palette.white,
 
-  text: palette.gray900,
+  text: palette.gray850,
   textMuted: palette.gray500,
   textInverse: palette.white,
 
@@ -64,14 +67,15 @@ export const darkColors: ColorTokens = {
   primary: palette.blue500,
   primaryHover: palette.blue600,
   onPrimary: palette.white,
-  primaryMuted: 'rgba(79, 124, 255, 0.16)',
+  onPrimaryMuted: 'rgba(255, 255, 255, 0.15)',
+  primaryMuted: palette.blueSoftDark,
 
   success: palette.green500,
-  successMuted: 'rgba(46, 213, 115, 0.16)',
+  successMuted: palette.greenSoftDark,
   error: palette.red500,
-  errorMuted: 'rgba(255, 71, 87, 0.16)',
+  errorMuted: palette.redSoftDark,
   warning: palette.amber500,
-  warningMuted: 'rgba(255, 165, 2, 0.16)',
+  warningMuted: palette.amberSoftDark,
 
   background: palette.gray900,
   surface: palette.gray800,
@@ -81,7 +85,7 @@ export const darkColors: ColorTokens = {
   textMuted: palette.gray400,
   textInverse: palette.gray900,
 
-  border: palette.gray700,
+  border: palette.gray650,
   borderStrong: palette.gray600,
 
   overlay: 'rgba(0, 0, 0, 0.6)',
