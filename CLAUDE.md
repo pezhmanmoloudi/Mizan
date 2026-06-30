@@ -131,3 +131,22 @@ The root `App.tsx` is a thin re-export of `@/app`. Entry is `index.ts` → `regi
 
 Primary `#4F7CFF` · Success `#2ED573` · Error `#FF4757` · Warning `#FFA502` ·
 Dark bg `#0F1115` · Light bg `#F7F8FA`. (Authoritative source: `src/theme/tokens`.)
+
+
+## Target platform priorities:
+
+* Primary platform: Android
+* Secondary platform: iOS
+
+Requirements:
+
+* All architecture must remain cross-platform
+* Avoid Android-only libraries unless necessary
+* Prefer Expo-compatible packages
+* Ensure RTL compatibility on both platforms
+* Use platform-aware styling only where truly needed
+
+Development priority:
+
+* Optimize and test primarily on Android first
+* Keep iOS compatibility intact
